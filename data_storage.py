@@ -57,12 +57,14 @@ class DataStorage:
 
 
     def save_topics(self, topics):
+
         with open(self.topics_filename, 'w') as file:
             json.dump(topics, file)
 
     def load_topics(self):
         if not os.path.exists(self.topics_filename):
-            self.save_topics(self.initial_topics)  # Save initial topics if the file doesn't exist
+            formatted_topics = [{'name': topic, 'success': 0, 'failure': 0} for topic in self.initial_topics]
+            self.save_topics(formatted_topics)
             return self.initial_topics
         with open(self.topics_filename, 'r') as file:
             return json.load(file)

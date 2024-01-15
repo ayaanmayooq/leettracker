@@ -50,6 +50,9 @@ class ProblemTracker:
     def record_solved_problem(self, problem_id: int):
         problem = self.storage.get_specific_problem(problem_id)
         if problem:
+            # Solved or Failed (had to see solution)
+            success = input("Successfully solved the problem (y/n)") == 'y'
+
             # Add or update fields
             problem['times_solved'] = problem.get('times_solved', 0) + 1
             # problem['solve_time'] = input("Enter solve time in minutes (optional): ") or None
@@ -57,7 +60,7 @@ class ProblemTracker:
             # Allow user to select topics or add a new one
             # Display existing topics
             for i, topic in enumerate(self.predefined_topics, 1):
-                print(f"{i}. {topic}")
+                print(f"{i}. {topic['name']}")
             print(f"{len(self.predefined_topics) + 1}. Add a new topic")
 
             selected_topics_indices = input("Enter choices: ")
@@ -67,10 +70,15 @@ class ProblemTracker:
             for index in selected_indices:
                 if int(index) == len(self.predefined_topics) + 1:
                     new_topic = input("Enter the new topic: ")
-                    self.predefined_topics.append(new_topic)
+                    self.predefined_topics.append({'name': new_topic, 'success': 0, 'failure': 0})
                     selected_topics.append(new_topic)
                 else:
                     selected_topics.append(self.predefined_topics[int(index) - 1])
+
+                if success:
+                    self.predefined_topics[int(index) - 1]['success'] += 1
+                else:
+                    self.predefined_topics[int(index) - 1]['failure'] += 1
 
             problem['topics'] = selected_topics
             self.storage.save_topics(self.predefined_topics)  # Save the updated topic list
